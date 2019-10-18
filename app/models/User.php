@@ -138,6 +138,14 @@
             return FALSE;
         }
         
+
+        public function putnull($mail){
+            $this->db->query('UPDATE login SET validate =0 where email=:mail');
+            $this->db->bind(":mail", $mail);
+            if ($this->db->execute())
+                return TRUE;
+            return FALSE;
+        }
     }
     
 ?>

@@ -49,9 +49,8 @@
         }
         
         public function getinfobyIdimg($id){
-            $this->db->query('SELECT * FROM `img` WHERE id_img = :id AND userid = :u_id');
+            $this->db->query('SELECT * FROM `img` WHERE id_img = :id');
             $this->db->bind(":id", $id);
-            $this->db->bind(":u_id", $_SESSION['user_id']);
             $this->db->execute();
             if($this->db->rowCount() > 0)
                 return (TRUE);

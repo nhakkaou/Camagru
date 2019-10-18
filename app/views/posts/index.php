@@ -45,7 +45,7 @@
                 <?php endif;?>
 
                
-                <i class="far fa-comments" onclick="add_div_cmnt()"></i>Comment
+                <i class="far fa-comments"></i>Comment
                
                 <div id="cmnt" class="animated">
                     <div class="overflow-auto" style="height:40px;">

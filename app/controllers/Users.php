@@ -168,7 +168,8 @@ class Users extends Controller{
     
     
     public function edit(){
-    	//Check for post
+        //Check for post
+        $s = 0;
     	if($_SERVER['REQUEST_METHOD'] == 'POST')
         {
             $_POST = filter_input_array(INPUT_POST, FILTER_SANITIZE_STRING);
@@ -206,6 +207,7 @@ class Users extends Controller{
                 if(preg_match("/[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$/",$data['email'])){
                     if($this->userModel->findUserByEmail($data['email']))
                         $data['email_error'] = "This Email is already existe";
+                    $s = 1;
                 }
                 else
                     $data['email_error'] = "Wrong Format";
@@ -241,11 +243,27 @@ class Users extends Controller{
             {
                 
                 if($this->userModel->edit($data))
-                {                    
+                {    
+                    if ($s)
+                    {
+                        if($this->userModel->putnull($data['email'])){
+                            $this->confirm($data['email'], $infos->forget_tk);
+                                unset($_SESSION['user_id']);
+                                unset($_SESSION['user_name']);
+                                unset($_SESSION['user_email']);
+                                unset($_SESSION['user_profile']);
+                                unset($_SESSION['recieve']);
+                                unset($_SESSION['nb_post']);
+                                unset($_SESSION['token']);
+                                session_destroy();
+                                redirect('users/login');
+                            }
+                        
+                    }else{
                     $_SESSION['user_name'] = $data['name'];
                     $_SESSION['user_email'] = $data['email'];
                     $_SESSION['recieve'] = $data['recieve'];
-                    redirect('posts/home');
+                    redirect('posts/home');}
                 }
                 else
                     die("Error");
@@ -268,19 +286,7 @@ class Users extends Controller{
          $this->view('users/edit', $data);
 }
     
-    public function creatUserSession($user){
-        if (!empty($user))
-        {
-                $_SESSION['user_id'] = $user->id;
-                $_SESSION['user_name'] = $user->name;
-                $_SESSION['user_email'] = $user->email;
-                $_SESSION['user_profile'] = $user->profilepic;
-                $_SESSION['recieve'] = $user->recieve;
-                $_SESSION['nb_post'] = $user->nb_post;
-                $_SESSION['token'] = str_shuffle($user->token);
-                redirect('posts/home');
-        }
-    }
+    
     
     public function take_pic(){
         $data = $this->postModel->getPostsById();
@@ -288,7 +294,25 @@ class Users extends Controller{
     }
     
     
-  
+    private function confirm($mail, $token){
+        if($result = $this->userModel->findUserByEmail($mail))
+        {
+            $str = str_shuffle($token);
+            $headers = "Content-type:text/html;charset=UTF-8" . "\r\n";
+            $to = $mail;
+            $sujet = "Confirm Account 'Camagru'";
+            $message = '<h1><strong>Camagru</strong></h1>   To Confirm your Account click in the link below! <a href="http://localhost/Camagru/users/check/?cle='.$str.'&email='.urlencode($mail).'">Link</a>';
+            if(mail($to, $sujet, $message, $headers))
+            {
+            if ($this->userModel->add_forget_tk($str, $mail))
+            {
+                flash('register_success', 'Check your mail');
+                redirect ('users/login');
+            }else
+                die('ERROR');
+            }
+        }
+    }
     
     public function change_profile_pic(){
             $test = getimagesize("../public/img/".$_POST['file']);
@@ -324,25 +348,7 @@ class Users extends Controller{
             redirect('users/login');
     }
     
-    public function confirm($mail, $token){
-    if($result = $this->userModel->findUserByEmail($mail))
-    {
-        $str = str_shuffle($token);
-        $headers = "Content-type:text/html;charset=UTF-8" . "\r\n";
-        $to = $mail;
-        $sujet = "Confirm Account 'Camagru'";
-        $message = '<h1><strong>Camagru</strong></h1>   To Confirm your Account click in the link below! <a href="http://localhost/Camagru/users/check/?cle='.$str.'&email='.urlencode($mail).'">Link</a>';
-        if(mail($to, $sujet, $message, $headers))
-        {
-        if ($this->userModel->add_forget_tk($str, $mail))
-        {
-            flash('register_success', 'Check your mail');
-            redirect ('users/login');
-        }else
-            die('ERROR');
-        }
-    }
-    }
+  
     
     
     
@@ -381,7 +387,21 @@ class Users extends Controller{
         }
         $this->view("users/forget_pass",$data);
     }
-    
+ 
+    private function creatUserSession($user){
+        if (!empty($user))
+        {
+                $_SESSION['user_id'] = $user->id;
+                $_SESSION['user_name'] = $user->name;
+                $_SESSION['user_email'] = $user->email;
+                $_SESSION['user_profile'] = $user->profilepic;
+                $_SESSION['recieve'] = $user->recieve;
+                $_SESSION['nb_post'] = $user->nb_post;
+                $_SESSION['token'] = str_shuffle($user->token);
+                redirect('posts/home');
+        }
+    }
+
     public function reset(){
          $data = ['new_mt' => '',
                 'new_cnf' => '',
