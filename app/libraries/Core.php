@@ -20,7 +20,8 @@ class Core{
             // check for  method of url
          if(isset($url[1])){
              if(method_exists($this->currentController, $url[1])){
-                 $this->currentMethod = $url[1];
+                if ($url[1] != 'confirm' && $url[1] != 'delete' && $url[1] != 'add_like' && $url[1] != 'add_cmnt' && $url[1] != 'change_profile_pic') 
+                    $this->currentMethod = $url[1];
                  unset($url[1]);
              }else
                  redirect('posts/home');

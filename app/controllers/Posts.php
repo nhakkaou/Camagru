@@ -158,7 +158,7 @@ class Posts extends Controller {
                             'name_s' => $_SESSION['user_name']];
                   
                     if ($mail->recieve != 0){
-                        $this->send_mail($data);
+                        send_mail($data);
                     }
                     redirect("posts/home?page=".$_POST['page']);
                 }else
@@ -168,16 +168,5 @@ class Posts extends Controller {
         }       
         }else
             redirect("posts/home?page=".$_POST['page']);
-    }
-   
-    private function send_mail($dt = 1){
-        $headers = "Content-type:text/html;charset=UTF-8" . "\r\n";
-        $to = $dt['email_r'];
-        $sujet = "NEW NOTIFICATION 'Camagru'";
-        $message = '<h1><strong>Camagru</strong></h1>   Hello '.$dt['recipteur'].' You have a new notification from '.$dt['name_s'];
-    if(mail($to, $sujet, $message, $headers))
-            return TRUE;
-        else
-            return FALSE;
     }
 }

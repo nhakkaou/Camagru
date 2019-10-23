@@ -28,6 +28,7 @@ class Users extends Controller{
         }else
             redirect('posts/index');
     }
+    
     public function register(){
     	//Check for post
     	if($_SERVER['REQUEST_METHOD'] == 'POST')
@@ -144,7 +145,7 @@ class Users extends Controller{
                 $logedInUser = $this->userModel->login($data['name'], $data['pass']);
                 if($logedInUser){
                     //Create session
-                    if($this->creatUserSession($logedInUser))
+                    if(CreatUserSession($logedInUser))
                         redirect("posts/home");
                 }else{
                     $data['pass_error'] = 'Password Incorrect';
@@ -387,20 +388,7 @@ class Users extends Controller{
         }
         $this->view("users/forget_pass",$data);
     }
- 
-    private function creatUserSession($user){
-        if (!empty($user))
-        {
-                $_SESSION['user_id'] = $user->id;
-                $_SESSION['user_name'] = $user->name;
-                $_SESSION['user_email'] = $user->email;
-                $_SESSION['user_profile'] = $user->profilepic;
-                $_SESSION['recieve'] = $user->recieve;
-                $_SESSION['nb_post'] = $user->nb_post;
-                $_SESSION['token'] = str_shuffle($user->token);
-                redirect('posts/home');
-        }
-    }
+
 
     public function reset(){
          $data = ['new_mt' => '',
