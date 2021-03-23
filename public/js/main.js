@@ -11,6 +11,7 @@ if (userid == "") {
    window.location.replace("http://localhost/Camagru/users/login");
    return ;
 }
+
  var xhttp = new XMLHttpRequest();
  xhttp.open('POST', 'http://localhost/Camagru/Posts/add_like');
 
