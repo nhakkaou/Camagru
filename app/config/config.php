@@ -4,10 +4,9 @@ define('DB_USER','root');
 define('DB_NAME','*****');
 define('DB_PASS','*****');
 
-// App ROOT
+
 define('APPROOT',dirname(dirname(__FILE__)));
-//define('ROOT',dirname(dirname(dirname(__FILE__))));
-// URL ROOT Or localhost
+
 define('URLROOT','http://localhost/Camagru');
 // Site name
 define('SITENAME','CAMAGRU');
